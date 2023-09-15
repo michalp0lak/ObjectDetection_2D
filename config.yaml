@@ -1,0 +1,64 @@
+global_args:
+  device: 'cuda'
+  seed: 0
+  output_path: /home/michal/Desktop/Data/LP_detector/
+
+dataset:
+  dataset_path: /home/michal/Desktop/Data/LicensePlate/
+  
+model:
+  model_name: 'RetinaNet'
+  backbone: 'mobilenet'
+  pretrained: True
+  classes: ['LP']
+
+  mobilenet:
+    batch_size: 24
+    image_size: 640
+    return_layers: {'stage1': 1, 'stage2': 2, 'stage3': 3}
+    in_channel: 32
+    out_channel: 64
+
+  resnet:
+    batch_size: 6
+    image_size: 840
+    return_layers: {'layer2': 1, 'layer3': 2, 'layer4': 3}
+    in_channel: 256
+    out_channel: 256
+
+  head:
+    # Priors
+    steps: [8, 16, 32]
+    aspects: [0.15, 0.3, 0.45, 0.6, 0.75, 0.9]
+    sizes: [[16, 32, 64], [128, 192, 256], [384, 512, 768]]
+    variances: [0.1, 0.2]
+    # Negative sampling ratio
+    negpos_ratio: 7
+    # NMS params
+    nms_top_k: 2000
+    nms_thresh: 0.1
+    score_thr: 0.25
+    # IOU threshold of True Positive for metrice evaluation
+    iou_thr: 0.5
+  
+  augment:
+    image_size: []
+
+pipeline:
+  inference_mode: True
+  is_resume: False
+  resume_from: 2023-07-03-14-51-05
+  max_epoch: 100
+  validation_freq: 5
+  save_ckpt_freq: 5
+  num_workers: 6
+  overlaps: [0.5]
+
+  loss:
+    cls_weight: 1.0
+    loc_weight: 2.0
+
+  optimizer:
+    lr: 0.001
+    momentum: 0.9
+    weight_decay: 0.0005
